@@ -3,26 +3,18 @@
 # pyre-strict
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Mapping,
-    List,
-    Optional,
-    Tuple,
-    TypedDict,
-    Union,
-)
+from typing import (Any, Callable, Dict, List, Mapping, Optional, Tuple,
+                    TypedDict, Union)
 
 import torch
 import torchaudio
 from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.strategies import DDPStrategy
 from torch import nn
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
+
 from utils import metrics
 from utils.dataset import utils as dataset_utils
 
@@ -319,7 +311,7 @@ def _get_dataloader(
 def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--batch-size", default=6, type=int)
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0mix", "librimix"])
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -423,10 +415,10 @@ def cli_main():
     trainer = Trainer(
         default_root_dir=args.exp_dir,
         max_epochs=args.epochs,
-        gpus=args.num_gpu,
         num_nodes=args.num_node,
-        accelerator="ddp",
-        plugins=DDPStrategy(find_unused_parameters=False),  # make sure there is no unused params
+        accelerator="gpu",
+        strategy=DDPStrategy(find_unused_parameters=False),  # make sure there is no unused params
+        devices=args.num_gpu,
         limit_train_batches=1.0,  # Useful for fast experiment
         gradient_clip_val=5.0,
         callbacks=callbacks,

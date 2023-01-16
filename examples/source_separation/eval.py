@@ -3,7 +3,8 @@ from pathlib import Path
 
 import mir_eval
 import torch
-from lightning_train import _get_model, _get_dataloader, sisdri_metric
+
+from lightning_train import _get_dataloader, _get_model, sisdri_metric
 
 
 def _eval(model, data_loader, device):
@@ -31,7 +32,7 @@ def _eval(model, data_loader, device):
 
 def cli_main():
     parser = ArgumentParser()
-    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0-mix", "librimix"])
+    parser.add_argument("--dataset", default="librimix", type=str, choices=["wsj0mix", "librimix"])
     parser.add_argument(
         "--root-dir",
         type=Path,
@@ -79,7 +80,7 @@ def cli_main():
 
     _, _, eval_loader = _get_dataloader(
         args.dataset,
-        args.data_dir,
+        args.root_dir,
         args.num_speakers,
         args.sample_rate,
         1,  # batch size is set to 1 to avoid masking
